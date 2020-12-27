@@ -21,21 +21,26 @@ SOURCES += \
     file.cpp \
     folder.cpp \
     logindialog.cpp \
+    logininformation.cpp \
     main.cpp \
     mainwindow.cpp \
-    serverconnector.cpp
+    serverconnector.cpp \
+    usermanagerdialog.cpp
 
 HEADERS += \
     audiometadata.h \
     file.h \
     folder.h \
     logindialog.h \
+    logininformation.h \
     mainwindow.h \
-    serverconnector.h
+    serverconnector.h \
+    usermanagerdialog.h
 
 FORMS += \
     logindialog.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    usermanagerdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -45,3 +50,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     resources.qrc
 
+macx {
+    QMAKE_INFO_PLIST += $${TARGET}/data/default.plist
+    QMAKE_POST_LINK += sed -i -e "s/@VERSION@/$$VERSION/g" "./$${TARGET}.app/Contents/Info.plist";
+}

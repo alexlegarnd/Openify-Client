@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     playlist = new QMediaPlaylist(player);
     player->setPlaylist(playlist);
     ui->volume->setValue(player->volume());
-    sc = new ServerConnector("localhost:4115", false);
+    this->sc = sc;
     connect(sc, &ServerConnector::MetadataReceived, this, &MainWindow::MetadataReceived);
     connect(sc, &ServerConnector::ListReceived, this, &MainWindow::ListReceived);
     connect(sc, &ServerConnector::OnError, this, &MainWindow::OnError);
@@ -20,11 +20,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->horizontalSlider, &QSlider::sliderMoved, this, &MainWindow::SliderMoved);
     connect(ui->currentList, &QListWidget::itemDoubleClicked, this, &MainWindow::SetCurrentMedia);
     connect(ui->volume, &QSlider::sliderMoved, this, &MainWindow::ChangeVolume);
+    connect(ui->actionRescan_folder, &QAction::triggered, this, &MainWindow::RescanFolder);
+    connect(ui->actionRefresh_list, &QAction::triggered, this, &MainWindow::RefreshList);
+    connect(ui->actionUser_Management, &QAction::triggered, this, &MainWindow::ShowUserManagement);
+    connect(ui->filesList, &QListWidget::customContextMenuRequested, this, &MainWindow::ShowFileContextMenu);
+    connect(ui->clearPlaylist, &QPushButton::clicked, this, &MainWindow::ClearPlaylist);
     connect(playlist, &QMediaPlaylist::currentIndexChanged, this, &MainWindow::CurrentMediaChanged);
     connect(player, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::SetStatus);
     connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::SetState);
     connect(player, &QMediaPlayer::durationChanged, this, &MainWindow::DurationChanged);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::PositionChanged);
+    ui->filesList->setContextMenuPolicy(Qt::CustomContextMenu);
     SetPlayButtonIcon("PLAY");
     sc->GetFilesList();
     ui->statusBar->showMessage("Loading files list...");
@@ -78,12 +84,49 @@ void MainWindow::PlaySelected(QListWidgetItem *item) {
         if (file.GetName() == name) {
             queue.append(file);
             ui->currentList->addItem(file.GetName());
-            playlist->addMedia(QUrl(sc->GetFileURL(file.GetId())));
+            playlist->addMedia(sc->GetFileURL(file.GetId()));
             playlist->setCurrentIndex(queue.size() - 1);
             player->play();
         }
     }
     EnablePlayButton();
+}
+
+void MainWindow::AddToSelected()
+{
+    for (QListWidgetItem *item : ui->filesList->selectedItems()) {
+        QString name = item->text();
+        for(File file : current.GetFiles()) {
+            if (file.GetName() == name) {
+                queue.append(file);
+                ui->currentList->addItem(file.GetName());
+                playlist->addMedia(sc->GetFileURL(file.GetId()));
+            }
+        }
+    }
+    EnablePlayButton();
+}
+
+void MainWindow::ShowFileContextMenu(const QPoint &pos) {
+    QPoint globalPos = ui->filesList->mapToGlobal(pos);
+    QMenu menu;
+    menu.addAction("Add to playlist", this, &MainWindow::AddToSelected);
+    menu.exec(globalPos);
+}
+
+void MainWindow::ClearPlaylist()
+{
+    player->stop();
+    playlist->clear();
+    queue.clear();
+    ui->currentList->clear();
+    EnablePlayButton();
+}
+
+void MainWindow::ShowUserManagement()
+{
+    UserManagerDialog d(sc);
+    d.exec();
 }
 
 void MainWindow::SetPlayButtonIcon(QString status) {
@@ -223,6 +266,16 @@ void MainWindow::SetCurrentMedia(QListWidgetItem *item)
 void MainWindow::ChangeVolume(int vol)
 {
     player->setVolume(vol);
+}
+
+void MainWindow::RescanFolder()
+{
+    sc->ReScanFolder();
+}
+
+void MainWindow::RefreshList()
+{
+    sc->GetFilesList();
 }
 
 void MainWindow::EnablePlayButton() {

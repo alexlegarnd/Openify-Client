@@ -6,10 +6,12 @@
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 #include <QMediaMetaData>
+
 #include "serverconnector.h"
 #include "folder.h"
 #include "file.h"
 #include "audiometadata.h"
+#include "usermanagerdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,12 +22,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(ServerConnector *sc, QWidget *parent = nullptr);
     ~MainWindow();
 
 public slots:
     void GoToFolder(QListWidgetItem *item);
     void PlaySelected(QListWidgetItem *item);
+    void AddToSelected();
     void SetStatus(QMediaPlayer::MediaStatus status);
     void SetState(QMediaPlayer::State state);
     void DurationChanged(qint64 dur);
@@ -38,6 +41,11 @@ public slots:
     void CurrentMediaChanged(int i);
     void SetCurrentMedia(QListWidgetItem *item);
     void ChangeVolume(int vol);
+    void RescanFolder();
+    void RefreshList();
+    void ShowFileContextMenu(const QPoint &pos);
+    void ClearPlaylist();
+    void ShowUserManagement();
 
 private:
     Ui::MainWindow *ui;
