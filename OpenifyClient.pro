@@ -10,6 +10,18 @@ macx {
     ICON = mac_icon.icns
 }
 
+win32 {
+    # remove possible other optimization flags
+    QMAKE_CXXFLAGS_RELEASE -= -O
+    QMAKE_CXXFLAGS_RELEASE -= -O1
+    QMAKE_CXXFLAGS_RELEASE *= -O2
+
+    # add the desired -O3 if not present, MinGW only
+    # QMAKE_CXXFLAGS_RELEASE *= -O3
+
+    RC_ICONS = win_icon.ico
+}
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
