@@ -11,6 +11,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     connect(ui->connectButton, &QPushButton::clicked, this, &LoginDialog::Login);
     connect(sc, &ServerConnector::OnError, this, &LoginDialog::OnError);
     connect(sc, &ServerConnector::LoginSuccess, this, &LoginDialog::OnLoginSuccessed);
+    connect(sc, &ServerConnector::ControllerVersionReceived, this, &LoginDialog::OnControllerVersionReceived);
     QString cachePath = GetLoginCachePath();
     if (QFile::exists(cachePath)) {
         QFile* file = new QFile(cachePath);
@@ -42,12 +43,9 @@ void LoginDialog::Login() {
     bool ssl = ui->useSSL->isChecked();
     if (!addr.isEmpty()) {
         sc->SetAddr(addr, ssl);
-        QString username = ui->username->text();
-        QString password = ui->password->text();
-        LoginInformation info(username, password);
         ui->errorLabel->setVisible(false);
         LockControls(true);
-        sc->Login(info);
+        sc->GetControllerVersion();
     }
 }
 
@@ -74,6 +72,20 @@ void LoginDialog::OnLoginSuccessed()
     }
     delete f;
     this->close();
+}
+
+void LoginDialog::OnControllerVersionReceived(int v, int min)
+{
+    if (VERSION >= min) {
+        QString username = ui->username->text();
+        QString password = ui->password->text();
+        LoginInformation info(username, password);
+        ui->errorLabel->setVisible(false);
+        sc->Login(info);
+    } else {
+        OnError("This client is too old (Minimal: " + QString::number(min)
+                + ", Current: " + QString::number(VERSION) + ")");
+    }
 }
 
 void LoginDialog::LockControls(bool b) {

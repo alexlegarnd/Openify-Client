@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     audiometadata.cpp \
+    editeduser.cpp \
     file.cpp \
     folder.cpp \
     logindialog.cpp \
@@ -25,16 +26,19 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     serverconnector.cpp \
+    userinfo.cpp \
     usermanagerdialog.cpp
 
 HEADERS += \
     audiometadata.h \
+    editeduser.h \
     file.h \
     folder.h \
     logindialog.h \
     logininformation.h \
     mainwindow.h \
     serverconnector.h \
+    userinfo.h \
     usermanagerdialog.h
 
 FORMS += \

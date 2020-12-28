@@ -1,6 +1,8 @@
 #ifndef LOGINDIALOG_H
 #define LOGINDIALOG_H
 
+#define VERSION 1
+
 #include <QDialog>
 #include <QStandardPaths>
 #include <QDir>
@@ -24,15 +26,16 @@ public:
     ServerConnector* GetServerConnector();
     bool IsSuccess();
 
-public slots:
+private slots:
     void Login();
     void OnError(QString);
     void OnLoginSuccessed();
+    void OnControllerVersionReceived(int, int);
 
 private:
     Ui::LoginDialog *ui;
     ServerConnector *sc;
-    bool success;
+    bool success = false;
     void LockControls(bool);
     QString GetLoginCachePath();
     void LoadCache(QString json);

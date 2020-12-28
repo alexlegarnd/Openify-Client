@@ -541,10 +541,15 @@
     </property>
     <addaction name="actionRescan_folder"/>
     <addaction name="actionRefresh_list"/>
-    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuAccount">
+    <property name="title">
+     <string>Account</string>
+    </property>
     <addaction name="actionUser_Management"/>
    </widget>
    <addaction name="menuServer"/>
+   <addaction name="menuAccount"/>
   </widget>
   <action name="actionRescan_folder">
    <property name="text">
@@ -564,6 +569,11 @@
   <action name="actionUser_Management">
    <property name="text">
     <string>User Management</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
    </property>
   </action>
  </widget>

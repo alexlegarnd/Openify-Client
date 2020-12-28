@@ -11,6 +11,7 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     player->setPlaylist(playlist);
     ui->volume->setValue(player->volume());
     this->sc = sc;
+    ui->actionRescan_folder->setEnabled(sc->GetLoggedUser().IsAdministrator());
     connect(sc, &ServerConnector::MetadataReceived, this, &MainWindow::MetadataReceived);
     connect(sc, &ServerConnector::ListReceived, this, &MainWindow::ListReceived);
     connect(sc, &ServerConnector::OnError, this, &MainWindow::OnError);
@@ -270,7 +271,9 @@ void MainWindow::ChangeVolume(int vol)
 
 void MainWindow::RescanFolder()
 {
-    sc->ReScanFolder();
+    if (sc->GetLoggedUser().IsAdministrator()) {
+        sc->ReScanFolder();
+    }
 }
 
 void MainWindow::RefreshList()

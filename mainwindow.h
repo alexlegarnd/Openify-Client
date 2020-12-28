@@ -25,7 +25,7 @@ public:
     MainWindow(ServerConnector *sc, QWidget *parent = nullptr);
     ~MainWindow();
 
-public slots:
+private slots:
     void GoToFolder(QListWidgetItem *item);
     void PlaySelected(QListWidgetItem *item);
     void AddToSelected();
