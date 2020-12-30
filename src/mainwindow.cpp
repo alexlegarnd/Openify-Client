@@ -6,6 +6,7 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    SetIconToButton(ui->clearPlaylist, ":/icons/pictures/clear.png", QSize(24, 24));
     player = new QMediaPlayer();
     playlist = new QMediaPlaylist(player);
     player->setPlaylist(playlist);
@@ -24,7 +25,9 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     connect(ui->actionRescan_folder, &QAction::triggered, this, &MainWindow::RescanFolder);
     connect(ui->actionRefresh_list, &QAction::triggered, this, &MainWindow::RefreshList);
     connect(ui->actionUser_Management, &QAction::triggered, this, &MainWindow::ShowUserManagement);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::ShowAboutDialog);
     connect(ui->filesList, &QListWidget::customContextMenuRequested, this, &MainWindow::ShowFileContextMenu);
+    connect(ui->foldersList, &QListWidget::customContextMenuRequested, this, &MainWindow::ShowFolderContextMenu);
     connect(ui->clearPlaylist, &QPushButton::clicked, this, &MainWindow::ClearPlaylist);
     connect(playlist, &QMediaPlaylist::currentIndexChanged, this, &MainWindow::CurrentMediaChanged);
     connect(player, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::SetStatus);
@@ -32,6 +35,7 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     connect(player, &QMediaPlayer::durationChanged, this, &MainWindow::DurationChanged);
     connect(player, &QMediaPlayer::positionChanged, this, &MainWindow::PositionChanged);
     ui->filesList->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->foldersList->setContextMenuPolicy(Qt::CustomContextMenu);
     SetPlayButtonIcon("PLAY");
     sc->GetFilesList();
     ui->statusBar->showMessage("Loading files list...");
@@ -108,10 +112,42 @@ void MainWindow::AddToSelected()
     EnablePlayButton();
 }
 
+void MainWindow::AddFolderToSelected()
+{
+    for (QListWidgetItem *item : ui->foldersList->selectedItems()) {
+        QString name = item->text();
+        for(Folder folder : current.GetFolders()) {
+            if (folder.GetName() == name) {
+                AddFolderToPlaylist(folder);
+            }
+        }
+    }
+    EnablePlayButton();
+}
+
+inline void MainWindow::AddFolderToPlaylist(Folder f) {
+    for(File file : f.GetFiles()) {
+        queue.append(file);
+        ui->currentList->addItem(file.GetName());
+        playlist->addMedia(sc->GetFileURL(file.GetId()));
+    }
+    for (Folder folder : f.GetFolders()) {
+        AddFolderToPlaylist(folder);
+    }
+}
+
 void MainWindow::ShowFileContextMenu(const QPoint &pos) {
     QPoint globalPos = ui->filesList->mapToGlobal(pos);
     QMenu menu;
     menu.addAction("Add to playlist", this, &MainWindow::AddToSelected);
+    menu.exec(globalPos);
+}
+
+void MainWindow::ShowFolderContextMenu(const QPoint &pos)
+{
+    QPoint globalPos = ui->foldersList->mapToGlobal(pos);
+    QMenu menu;
+    menu.addAction("Add to playlist", this, &MainWindow::AddFolderToSelected);
     menu.exec(globalPos);
 }
 
@@ -130,10 +166,15 @@ void MainWindow::ShowUserManagement()
     d.exec();
 }
 
-void MainWindow::SetPlayButtonIcon(QString status) {
-    ui->playButton->setText("");
-    ui->playButton->setIcon(QIcon(":/icons/pictures/" + status + ".png"));
-    ui->playButton->setIconSize(QSize(48, 48));
+void MainWindow::ShowAboutDialog()
+{
+    AboutDialog a(sc);
+    a.exec();
+}
+
+inline void MainWindow::SetPlayButtonIcon(QString status) {
+    SetIconToButton(ui->playButton, ":/icons/pictures/" + status + ".png", QSize(48, 48));
+
 }
 
 void MainWindow::SetStatus(QMediaPlayer::MediaStatus status) {
@@ -199,6 +240,7 @@ void MainWindow::SetState(QMediaPlayer::State state) {
 void MainWindow::DurationChanged(qint64 dur)
 {
     ui->horizontalSlider->setMaximum(dur);
+    ui->totalTime->setText(QDateTime::fromTime_t(dur/1000).toUTC().toString("hh:mm:ss"));
 }
 
 void MainWindow::PositionChanged(qint64 pos)
@@ -283,4 +325,11 @@ void MainWindow::RefreshList()
 
 void MainWindow::EnablePlayButton() {
     ui->playButton->setEnabled(queue.size() > 0);
+}
+
+inline void MainWindow::SetIconToButton(QPushButton *b, QString url, QSize s)
+{
+    b->setText("");
+    b->setIcon(QIcon(url));
+    b->setIconSize(s);
 }

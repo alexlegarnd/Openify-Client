@@ -1,7 +1,7 @@
 #ifndef LOGINDIALOG_H
 #define LOGINDIALOG_H
 
-#define VERSION 1
+#define CONTROLLER_VERSION 1
 
 #include <QDialog>
 #include <QStandardPaths>
@@ -25,6 +25,7 @@ public:
 
     ServerConnector* GetServerConnector();
     bool IsSuccess();
+    static QString GetControllerVersion();
 
 private slots:
     void Login();

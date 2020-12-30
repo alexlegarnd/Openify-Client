@@ -311,6 +311,32 @@ void ServerConnector::GetControllerVersion()
     });
 }
 
+void ServerConnector::GetServerAbout() {
+    auto *NAManager = new QNetworkAccessManager();
+    QUrl url (addr + SERVER_ABOUT);
+    QNetworkRequest request(url);
+    if(addr.startsWith("https://")) {
+        request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
+    }
+    request.setRawHeader("authorization", QString("Bearer " + token).toUtf8());
+    QNetworkReply *reply = NAManager->get(request);
+    connect(reply, &QNetworkReply::finished, [=]() {
+        if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::InternalServerError) {
+            QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+            QJsonObject obj = doc.object();
+            if (obj["success"].toBool()) {
+                emit ServerAboutReceived(AboutInfo(obj));
+            } else {
+                emit OnError(obj["message"].toString());
+            }
+        } else {
+            emit OnError(reply->errorString());
+        }
+        reply->deleteLater();
+        NAManager->deleteLater();
+    });
+}
+
 void ServerConnector::SetAddr(QString addr, bool ssl)
 {
     if (!addr.endsWith("/")) {

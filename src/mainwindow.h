@@ -12,6 +12,7 @@
 #include "file.h"
 #include "audiometadata.h"
 #include "usermanagerdialog.h"
+#include "aboutdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,6 +30,7 @@ private slots:
     void GoToFolder(QListWidgetItem *item);
     void PlaySelected(QListWidgetItem *item);
     void AddToSelected();
+    void AddFolderToSelected();
     void SetStatus(QMediaPlayer::MediaStatus status);
     void SetState(QMediaPlayer::State state);
     void DurationChanged(qint64 dur);
@@ -44,8 +46,10 @@ private slots:
     void RescanFolder();
     void RefreshList();
     void ShowFileContextMenu(const QPoint &pos);
+    void ShowFolderContextMenu(const QPoint &pos);
     void ClearPlaylist();
     void ShowUserManagement();
+    void ShowAboutDialog();
 
 private:
     Ui::MainWindow *ui;
@@ -57,7 +61,9 @@ private:
     QMediaPlayer *player;
     void UpdateList();
     void GoBack();
-    void SetPlayButtonIcon(QString status);
+    inline void SetPlayButtonIcon(QString status);
     void EnablePlayButton();
+    inline void SetIconToButton(QPushButton *b, QString url, QSize s);
+    inline void AddFolderToPlaylist(Folder f);
 };
 #endif // MAINWINDOW_H

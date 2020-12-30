@@ -156,9 +156,9 @@
    <property name="geometry">
     <rect>
      <x>11</x>
-     <y>180</y>
+     <y>159</y>
      <width>370</width>
-     <height>20</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -169,6 +169,9 @@
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

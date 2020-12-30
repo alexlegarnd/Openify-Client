@@ -22,6 +22,8 @@ win32 {
     RC_ICONS = win_icon.ico
 }
 
+VERSION = 1.0.0.0
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -35,34 +37,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    audiometadata.cpp \
-    editeduser.cpp \
-    file.cpp \
-    folder.cpp \
-    logindialog.cpp \
-    logininformation.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    serverconnector.cpp \
-    userinfo.cpp \
-    usermanagerdialog.cpp
+    src/aboutdialog.cpp \
+    src/aboutinfo.cpp \
+    src/audiometadata.cpp \
+    src/editeduser.cpp \
+    src/file.cpp \
+    src/folder.cpp \
+    src/logindialog.cpp \
+    src/logininformation.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/serverconnector.cpp \
+    src/userinfo.cpp \
+    src/usermanagerdialog.cpp
 
 HEADERS += \
-    audiometadata.h \
-    editeduser.h \
-    file.h \
-    folder.h \
-    logindialog.h \
-    logininformation.h \
-    mainwindow.h \
-    serverconnector.h \
-    userinfo.h \
-    usermanagerdialog.h
+    src/aboutdialog.h \
+    src/aboutinfo.h \
+    src/audiometadata.h \
+    src/editeduser.h \
+    src/file.h \
+    src/folder.h \
+    src/logindialog.h \
+    src/logininformation.h \
+    src/mainwindow.h \
+    src/serverconnector.h \
+    src/userinfo.h \
+    src/usermanagerdialog.h
 
 FORMS += \
-    logindialog.ui \
-    mainwindow.ui \
-    usermanagerdialog.ui
+    ui/aboutdialog.ui \
+    ui/logindialog.ui \
+    ui/mainwindow.ui \
+    ui/usermanagerdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

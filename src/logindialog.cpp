@@ -38,6 +38,11 @@ bool LoginDialog::IsSuccess()
     return success;
 }
 
+QString LoginDialog::GetControllerVersion()
+{
+    return QString::number(CONTROLLER_VERSION);
+}
+
 void LoginDialog::Login() {
     QString addr = ui->server->text();
     bool ssl = ui->useSSL->isChecked();
@@ -76,7 +81,7 @@ void LoginDialog::OnLoginSuccessed()
 
 void LoginDialog::OnControllerVersionReceived(int v, int min)
 {
-    if (VERSION >= min) {
+    if (CONTROLLER_VERSION >= min) {
         QString username = ui->username->text();
         QString password = ui->password->text();
         LoginInformation info(username, password);
@@ -84,7 +89,7 @@ void LoginDialog::OnControllerVersionReceived(int v, int min)
         sc->Login(info);
     } else {
         OnError("This client is too old (Minimal: " + QString::number(min)
-                + ", Current: " + QString::number(VERSION) + ")");
+                + ", Current: " + QString::number(CONTROLLER_VERSION) + ")");
     }
 }
 

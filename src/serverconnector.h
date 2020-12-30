@@ -13,6 +13,7 @@
 #define REGISTER "api/system/user/register"
 #define REMOVE_USER "api/system/user/remove"
 #define UPDATE_USER "api/system/user/update"
+#define SERVER_ABOUT "api/system/server/about"
 
 #include <QEventLoop>
 #include <QNetworkAccessManager>
@@ -27,6 +28,7 @@
 #include "logininformation.h"
 #include "userinfo.h"
 #include "editeduser.h"
+#include "aboutinfo.h"
 
 class ServerConnector : public QObject
 {
@@ -50,6 +52,7 @@ signals:
     void UserRegistered();
     void UserRemoved();
     void UserEdited();
+    void ServerAboutReceived(AboutInfo);
 
 public:
     ServerConnector() {};
@@ -66,7 +69,7 @@ public:
     void Register(UserInfo);
     void RemoveUser(QString);
     void UpdateUser(EditedUser eu);
-
+    void GetServerAbout();
 
     void SetAddr(QString addr, bool ssl);
     QString GetAddr();
