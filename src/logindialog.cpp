@@ -47,6 +47,19 @@ void LoginDialog::Login() {
     QString addr = ui->server->text();
     bool ssl = ui->useSSL->isChecked();
     if (!addr.isEmpty()) {
+        #ifdef __APPLE__
+            if (!ssl) {
+                QMessageBox msgBox;
+                msgBox.setText("macOS need HTTPS to download files");
+                msgBox.setInformativeText("Music playback may not work properly (or at all). Are you sure you want to continue with plain HTTP?");
+                msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                msgBox.setDefaultButton(QMessageBox::No);
+                int ret = msgBox.exec();
+                if (ret == QMessageBox::No) {
+                    return;
+                }
+            }
+        #endif
         sc->SetAddr(addr, ssl);
         ui->errorLabel->setVisible(false);
         LockControls(true);

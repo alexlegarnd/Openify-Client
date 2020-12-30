@@ -7,6 +7,9 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QFile>
+#ifdef __APPLE__
+    #include <QMessageBox>
+#endif
 
 #include "serverconnector.h"
 #include "mainwindow.h"
