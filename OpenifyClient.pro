@@ -14,7 +14,7 @@ win32 {
     # remove possible other optimization flags
     QMAKE_CXXFLAGS_RELEASE -= -O
     QMAKE_CXXFLAGS_RELEASE -= -O1
-    QMAKE_CXXFLAGS_RELEASE *= -O2
+    QMAKE_CXXFLAGS_RELEASE += -O2
 
     # add the desired -O3 if not present, MinGW only
     # QMAKE_CXXFLAGS_RELEASE *= -O3
@@ -22,7 +22,7 @@ win32 {
     RC_ICONS = win_icon.ico
 }
 
-VERSION = 1.0.0.0
+VERSION = 1.0.1.0
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings

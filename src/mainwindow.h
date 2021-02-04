@@ -6,6 +6,7 @@
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 #include <QMediaMetaData>
+#include <QGraphicsDropShadowEffect>
 
 #include "serverconnector.h"
 #include "folder.h"

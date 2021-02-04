@@ -10,11 +10,17 @@ QString AudioMetadata::GetTitle() const
 
 QString AudioMetadata::GetAlbum() const
 {
+    if (album.isEmpty()) {
+        return "?";
+    }
     return album;
 }
 
 QString AudioMetadata::GetArtist() const
 {
+    if (artist.isEmpty()) {
+        return "?";
+    }
     return artist;
 }
 

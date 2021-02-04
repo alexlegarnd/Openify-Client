@@ -1,6 +1,6 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
-#define CLIENT_VERSION "1.0.0.0"
+#define CLIENT_VERSION "1.0.1.0"
 
 #include <QDialog>
 

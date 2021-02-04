@@ -6,7 +6,12 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    SetIconToButton(ui->clearPlaylist, ":/icons/pictures/clear.png", QSize(24, 24));
+    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
+    shadow->setBlurRadius(5);
+    shadow->setYOffset(-2);
+    shadow->setXOffset(0);
+    shadow->setColor(QColor(102, 102, 102));
+    ui->playerPanel->setGraphicsEffect(shadow);
     player = new QMediaPlayer();
     playlist = new QMediaPlaylist(player);
     player->setPlaylist(playlist);
@@ -28,7 +33,7 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::ShowAboutDialog);
     connect(ui->filesList, &QListWidget::customContextMenuRequested, this, &MainWindow::ShowFileContextMenu);
     connect(ui->foldersList, &QListWidget::customContextMenuRequested, this, &MainWindow::ShowFolderContextMenu);
-    connect(ui->clearPlaylist, &QPushButton::clicked, this, &MainWindow::ClearPlaylist);
+    connect(ui->actionClear_playlist, &QAction::triggered, this, &MainWindow::ClearPlaylist);
     connect(playlist, &QMediaPlaylist::currentIndexChanged, this, &MainWindow::CurrentMediaChanged);
     connect(player, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::SetStatus);
     connect(player, &QMediaPlayer::stateChanged, this, &MainWindow::SetState);
@@ -38,7 +43,7 @@ MainWindow::MainWindow(ServerConnector *sc, QWidget *parent)
     ui->foldersList->setContextMenuPolicy(Qt::CustomContextMenu);
     SetPlayButtonIcon("PLAY");
     sc->GetFilesList();
-    ui->statusBar->showMessage("Loading files list...");
+    //ui->statusBar->showMessage("Loading files list...");
 }
 
 MainWindow::~MainWindow()
@@ -180,49 +185,51 @@ inline void MainWindow::SetPlayButtonIcon(QString status) {
 void MainWindow::SetStatus(QMediaPlayer::MediaStatus status) {
     switch (status) {
     case QMediaPlayer::UnknownMediaStatus : {
-        ui->statusBar->showMessage("The status of the media cannot be determined.");
+        //ui->statusBar->showMessage("The status of the media cannot be determined.");
         ui->horizontalSlider->setEnabled(false);
         break;
     }
     case QMediaPlayer::NoMedia : {
-        ui->statusBar->showMessage("Stopped");
-        ui->mediaTitle->setText("Nothing playing");
+        //ui->statusBar->showMessage("Stopped");
+        //ui->mediaTitle->setText("Nothing playing");
+        ui->titlePlayer->setText("");
+        ui->artisteAlbumPlayer->setText("");
         ui->horizontalSlider->setEnabled(false);
         break;
     }
     case QMediaPlayer::LoadingMedia : {
-        ui->statusBar->showMessage("Loading...");
+        //ui->statusBar->showMessage("Loading...");
         ui->horizontalSlider->setEnabled(false);
         break;
     }
     case QMediaPlayer::LoadedMedia : {
-        ui->statusBar->showMessage("Ready");
+        //ui->statusBar->showMessage("Ready");
 
         ui->horizontalSlider->setEnabled(true);
         break;
     }
     case QMediaPlayer::StalledMedia : {
-        ui->statusBar->showMessage("Buffering...");
+        //ui->statusBar->showMessage("Buffering...");
         ui->horizontalSlider->setEnabled(false);
         break;
     }
     case QMediaPlayer::BufferingMedia : {
-        ui->statusBar->showMessage("Buffering...");
+        ////ui->statusBar->showMessage("Buffering...");
         ui->horizontalSlider->setEnabled(false);
         break;
     }
     case QMediaPlayer::BufferedMedia : {
-        ui->statusBar->showMessage("Buffered");
+        //ui->statusBar->showMessage("Buffered");
         ui->horizontalSlider->setEnabled(true);
         break;
     }
     case QMediaPlayer::EndOfMedia : {
-        ui->statusBar->showMessage("Stopped");
+        //ui->statusBar->showMessage("Stopped");
         ui->horizontalSlider->setEnabled(true);
         break;
     }
     case QMediaPlayer::InvalidMedia : {
-        ui->statusBar->showMessage("The current media cannot be played.");
+        //ui->statusBar->showMessage("The current media cannot be played.");
         ui->horizontalSlider->setEnabled(false);
         break;
     }
@@ -264,28 +271,28 @@ void MainWindow::ChangeState() {
 
 void MainWindow::MetadataReceived(AudioMetadata md)
 {
-    ui->mediaTitle->setText(md.GetTitle());
-    ui->album->setText(md.GetAlbum());
-    ui->artist->setText(md.GetArtist());
-    ui->albumArtist->setText(md.GetAlbumArtist());
-    ui->composer->setText(md.GetComposer());
-    ui->year->setNum(md.GetYear());
-    ui->genre->setText(md.GetGenre());
-    ui->comment->setText(md.GetComment());
-    ui->codec->setText(md.GetCodec());
-    ui->filename->setText(md.GetFilename());
+    QFontMetrics metrics(ui->titlePlayer->font());
+    QString elidedTitle = metrics.elidedText(md.GetTitle(), Qt::ElideRight, ui->titlePlayer->width());
+    ui->titlePlayer->setText(elidedTitle);
+
+    metrics = QFontMetrics(ui->titlePlayer->font());
+    QString elidedAlbumArtist = metrics.elidedText(
+                QString("%1 - %2").arg(md.GetArtist()).arg(md.GetAlbum())
+                , Qt::ElideRight, ui->titlePlayer->width());
+    ui->artisteAlbumPlayer->setText(elidedAlbumArtist);
 }
 
 void MainWindow::ListReceived(Folder root)
 {
     current = root;
     UpdateList();
-    ui->statusBar->showMessage("Files list loaded!", 3000);
+    //ui->statusBar->showMessage("Files list loaded!", 3000);
 }
 
 void MainWindow::OnError(QString error)
 {
-    ui->statusBar->showMessage(error);
+    //ui->statusBar->showMessage(error);
+    QMessageBox::critical(this, tr("Error"), error, QMessageBox::Ok);
 }
 
 void MainWindow::CurrentMediaChanged(int i)
